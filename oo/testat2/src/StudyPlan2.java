@@ -13,7 +13,7 @@ public class StudyPlan2 {
     }
 
     public void initModules() throws IOException {
-        try (var reader = new CatalogueReader2(fileName)) {
+        try (var reader = new CatalogueReader(fileName)) {
             String[] names;
             while ((names = reader.readNextLine()) != null) {
                 if (!modules.containsKey(names[0])) {
@@ -31,7 +31,7 @@ public class StudyPlan2 {
         }
     }
 
-    public void calculateStudyPlan() throws CycleDependencyException2 {
+    public void calculateStudyPlan() throws CycleDependencyException {
         var addedModules = new HashSet<Module2>();
         int currentSemester = 1;
         while (addedModules.size() != modules.size()) {
@@ -52,7 +52,7 @@ public class StudyPlan2 {
                 }
             }
             if (cycle) {
-                throw new CycleDependencyException2("Cycle detected!");
+                throw new CycleDependencyException("Cycle detected!");
             }
             semesters.put(currentSemester, semester);
             currentSemester++;

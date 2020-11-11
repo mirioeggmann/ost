@@ -13,7 +13,7 @@ public class StudyPlan1 {
     }
 
     public void initModules() throws IOException {
-        try (var reader = new CatalogueReader1(fileName)) {
+        try (var reader = new CatalogueReader(fileName)) {
             String[] names;
             while ((names = reader.readNextLine()) != null) {
                 if (!modules.containsKey(names[0])) {
@@ -30,7 +30,7 @@ public class StudyPlan1 {
         }
     }
 
-    public void calculateStudyPlan() throws CycleDependencyException1 {
+    public void calculateStudyPlan() throws CycleDependencyException {
         var openModules = modules;
         semesters = new HashMap<>();
 
@@ -61,7 +61,7 @@ public class StudyPlan1 {
         }
     }
 
-    private Set<Module1> getModulesWithoutDependencies(Map<String, Module1> openModules) throws CycleDependencyException1 {
+    private Set<Module1> getModulesWithoutDependencies(Map<String, Module1> openModules) throws CycleDependencyException {
         var modulesWithoutDependencies = new HashSet<Module1>();
         for (Module1 module : openModules.values()) {
             if (module.getRequiredModules().isEmpty()) {
@@ -69,7 +69,7 @@ public class StudyPlan1 {
             }
         }
         if (modulesWithoutDependencies.isEmpty()) {
-            throw new CycleDependencyException1("Cycle detected!");
+            throw new CycleDependencyException("Cycle detected!");
         }
         return modulesWithoutDependencies;
     }

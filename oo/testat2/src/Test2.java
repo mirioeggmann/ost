@@ -13,7 +13,7 @@ public class Test2 {
             studyPlan.calculateStudyPlan();
             System.out.println("calculating the study plan took: " + (System.currentTimeMillis() - start) + "ms");
             studyPlan.printStudyPlan();
-        } catch (CycleDependencyException2 e) {
+        } catch (CycleDependencyException e) {
             System.out.println("No calculations possible: " + e.getMessage());
         }
     }

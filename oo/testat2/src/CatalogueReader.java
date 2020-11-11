@@ -3,10 +3,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class CatalogueReader2 implements AutoCloseable {
+public class CatalogueReader implements AutoCloseable {
     private final BufferedReader reader;
 
-    public CatalogueReader2(String filePath) throws FileNotFoundException {
+    public CatalogueReader(String filePath) throws FileNotFoundException {
         reader = new BufferedReader(new FileReader(filePath));
     }
 
