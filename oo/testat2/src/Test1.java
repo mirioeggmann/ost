@@ -1,8 +1,8 @@
 import java.io.IOException;
 
-public class Test {
+public class Test1 {
     public static void main(String[] args) {
-        var studyPlan = new StudyPlan("LargeCatalogue.txt");
+        var studyPlan = new StudyPlan1("LargeCatalogue.txt");
         try {
             studyPlan.initModules();
         } catch (IOException e) {
@@ -12,9 +12,9 @@ public class Test {
             long start = System.currentTimeMillis();
             studyPlan.calculateStudyPlan();
             System.out.println("calculating the study plan took: " + (System.currentTimeMillis() - start) + "ms");
-        } catch (CycleDependencyException e) {
+            studyPlan.printStudyPlan();
+        } catch (CycleDependencyException1 e) {
             System.out.println("No calculations possible: " + e.getMessage());
         }
-        studyPlan.printStudyPlan();
     }
 }

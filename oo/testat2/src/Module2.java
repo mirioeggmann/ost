@@ -2,16 +2,16 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class Module {
+public class Module2 {
     private final String name;
-    private final Set<Module> nextModules = new HashSet<>();
+    private final Set<Module2> nextModules = new HashSet<>();
     private int amountRequiredModules;
 
-    public Module(String name) {
+    public Module2(String name) {
         this.name = name;
     }
 
-    public void addNextModule(Module module) {
+    public void addNextModule(Module2 module) {
         nextModules.add(module);
     }
 
@@ -19,7 +19,7 @@ public class Module {
         return name;
     }
 
-    public Set<Module> getNextModules() {
+    public Set<Module2> getNextModules() {
         return nextModules;
     }
 
@@ -44,7 +44,7 @@ public class Module {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Module module = (Module) o;
+        Module2 module = (Module2) o;
         return Objects.equals(name, module.name);
     }
 

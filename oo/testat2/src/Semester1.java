@@ -1,11 +1,11 @@
 import java.util.HashSet;
 import java.util.Set;
 
-public class Semester {
+public class Semester1 {
     private final int number;
-    private final Set<Module> modules = new HashSet<>();
+    private final Set<Module1> modules = new HashSet<>();
 
-    public Semester(int number) {
+    public Semester1(int number) {
         this.number = number;
     }
 
@@ -13,7 +13,7 @@ public class Semester {
         return number;
     }
 
-    public Set<Module> getModules() {
+    public Set<Module1> getModules() {
         return modules;
     }
 }
