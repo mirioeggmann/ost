@@ -1,0 +1,2 @@
+- https://dialogflow.cloud.google.com/#/agent/coffee-shop-ingl/entities
+- 
