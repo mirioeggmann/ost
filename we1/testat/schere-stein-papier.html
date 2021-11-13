@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Schere Stein Papier</title>
+    <link rel="stylesheet" href="styles/global.css">
+</head>
+<body>
+<section id="home">
+    <button id="home-switch-button" type="submit">Wechsle zu Server</button>
+    <h2>Rangliste</h2>
+    <ul id="home-ranking"></ul>
+    <hr>
+    <p>Starten Sie ein neues Spiel</p>
+    <form id="home-form">
+        <p>
+            <label for="home-form-name">Name</label>
+            <input type="text" id="home-form-name" required>
+        </p>
+        <button type="submit">Spiel Starten</button>
+    </form>
+</section>
+<section id="game">
+    <p>
+        <span id="game-username">?</span>! Wähle deine Hand!
+    </p>
+    <div id="game-hand"></div>
+    <p id="game-status"></p>
+    <div id="game-enemy-hand">?</div>
+    <button id="game-switch-button">Zurück zum Ranking</button>
+    <hr>
+    <h2>History</h2>
+    <table id="game-history">
+        <tr>
+            <th>Resultat</th>
+            <th>Spieler</th>
+            <th>Gegner</th>
+        </tr>
+    </table>
+</section>
+<script src="scripts/main.js" type="module"></script>
+</body>
+</html>

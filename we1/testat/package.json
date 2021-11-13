@@ -1,0 +1,27 @@
+{
+  "name": "wed-1-testat-template",
+  "version": "1.0.0",
+  "description": "Testat template",
+  "main": "scripts/main.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "stylelint": "stylelint \"**/*.css\"",
+    "w3c": "html-validator --file ./schere-stein-papier.html  --verbose",
+    "eslint": "eslint scripts/**",
+    "all": "npm run stylelint && npm run w3c  && npm run eslint  && node -e \"console.log('npm run all completed')\""
+  },
+  "author": "Markus Stolze / Michael Gfeller",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^7.21.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1",
+    "stylelint": "^13.13.1",
+    "stylelint-config-standard": "^21.0.0"
+  },
+  "dependencies": {
+    "@web-and-design/eslint-plugin-wed": "^1.0.0",
+    "html-validator-cli": "^7.0.1"
+  }
+}
