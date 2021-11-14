@@ -1,34 +1,26 @@
-const DELAY_MS = 750;
-
+const DELAY_MS = 1000;
 const playerStats = {};
 
-function getRankingsFromPlayerStats(stats) {
-    const playerNames = Object.keys(stats);
-
-    // compute the ranking
+function getRankingsFromPlayerStats() {
+    const playerNames = Object.keys(playerStats);
     let ranking = [];
-    for (let i = 0; i < playerNames.length; i++) {
-        const playerName = playerNames[i];
-        const playerInfo = stats[playerName];
-
+    playerNames.forEach((playerName) => {
+        const playerInfo = playerStats[playerName];
         if (ranking[playerInfo.win] === undefined) {
-            ranking[playerInfo.win] = {rank: null, wins: playerInfo.win, players: [playerInfo.user]};
+            ranking[playerInfo.win] = {
+                rank: null,
+                wins: playerInfo.win,
+                players: [playerInfo.user],
+            };
         } else {
             ranking[playerInfo.win].players.push(playerInfo.user);
         }
-    }
-
-    // remove holes from ranking array
+    });
     ranking = ranking.filter((element) => element !== null);
-
-    // sort by win amount
-    ranking.sort((lhs, rhs) => rhs.wins - lhs.wins);
-
-    // set rank property
-    for (let i = 0; i < ranking.length; i++) {
-        ranking[i].rank = i + 1;
-    }
-
+    ranking.sort((left, right) => right.wins - left.wins);
+    ranking.forEach((element, index) => {
+        element.rank = index + 1;
+    });
     return ranking;
 }
 
@@ -45,13 +37,14 @@ export function isConnected() {
 }
 
 export async function getRankings(rankingsCallbackHandlerFn) {
-    const rankingsArray = getRankingsFromPlayerStats(playerStats);
+    const rankingsArray = getRankingsFromPlayerStats();
     setTimeout(() => rankingsCallbackHandlerFn(rankingsArray), DELAY_MS);
 }
 
-export const RESULT_WIN = -1;
-export const RESULT_TIE = 0;
-export const RESULT_LOSE = 1;
+const RESULT_WIN = -1;
+const RESULT_TIE = 0;
+const RESULT_LOSE = 1;
+
 const evalLookup = {
     Schere: {
         Schere: RESULT_TIE,
@@ -94,8 +87,9 @@ function getGameEval(playerHand, systemHand) {
     return evalLookup[playerHand][systemHand];
 }
 
-function updateLocalRanking(playerName, gameEval) {
-    // initialize a record for the player
+export async function evaluateHand(playerName, playerHand, gameRecordHandlerCallbackFn) {
+    const systemHand = HANDS[Math.floor(Math.random() * HANDS.length)];
+    const gameEval = getGameEval(playerHand, systemHand);
     if (playerStats[playerName] === undefined) {
         playerStats[playerName] = {
             user: playerName,
@@ -103,18 +97,10 @@ function updateLocalRanking(playerName, gameEval) {
             lost: 0,
         };
     }
-
-    // update scoreboard
     if (gameEval === RESULT_WIN) {
         playerStats[playerName].win++;
     } else if (gameEval === RESULT_LOSE) {
         playerStats[playerName].lost++;
     }
-}
-
-export async function evaluateHand(playerName, playerHand, gameRecordHandlerCallbackFn) {
-    const systemHand = HANDS[Math.floor(Math.random() * HANDS.length)];
-    const gameEval = getGameEval(playerHand, systemHand);
-    updateLocalRanking(playerName, gameEval);
     setTimeout(() => gameRecordHandlerCallbackFn({playerHand, systemHand, gameEval}), DELAY_MS);
 }
