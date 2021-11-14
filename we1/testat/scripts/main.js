@@ -40,64 +40,36 @@ const domHomeFormName = document.getElementById('home-form-name');
 
 const domGame = document.getElementById('game');
 const domGameUsername = document.getElementById('game-username');
-const domGameHand = document.getElementById('game-hand');
+const domGameHandSchere = document.getElementById('game-hand-schere');
+const domGameHandStein = document.getElementById('game-hand-stein');
+const domGameHandPapier = document.getElementById('game-hand-papier');
+const domGameHandBrunnen = document.getElementById('game-hand-brunnen');
+const domGameHandStreichholz = document.getElementById('game-hand-streichholz');
 const domGameStatus = document.getElementById('game-status');
 const domGameEnemyHand = document.getElementById('game-enemy-hand');
 const domGameSwitchButton = document.getElementById('game-switch-button');
 const domGameHistory = document.getElementById('game-history');
 
-function homeRankingHTMLString(ranking) {
+function homeRankingElementHTMLString(ranking) {
     return `<li>${ranking.rank}. Rang mit ${ranking.wins} Siegen : ${ranking.players.join(', ')}</li>`;
 }
 
-function createGameScoreboardEntryNode(ranking) {
-    const node = document.createElement('tr');
-
-    const result = document.createElement('td');
-    const userHand = document.createElement('td');
-    const enemyHand = document.createElement('td');
-
-    result.dataset.gameEval = ranking.gameEval;
-
-    result.textContent = resultGermanTranslation[ranking.gameEval];
-    userHand.textContent = ranking.playerHand;
-    enemyHand.textContent = ranking.systemHand;
-
-    node.appendChild(result);
-    node.appendChild(userHand);
-    node.appendChild(enemyHand);
-
-    return node;
-}
-
-function createUserChoiceButton(name) {
-    const node = document.createElement('button');
-
-    node.classList.add('big-button');
-    node.textContent = name;
-    node.dataset.choiceName = name;
-
-    return node;
+function gameHistoryRowHTMLString(ranking) {
+    return `<tr>
+                <td>${resultGermanTranslation[ranking.gameEval]}</td>
+                <td>${ranking.playerHand}</td>
+                <td>${ranking.systemHand}</td>
+            </tr>`;
 }
 
 // Controller
-class StonePaperScissorGame {
+class Game {
     constructor(gameService) {
         this.gameService = gameService;
         this.state = stateMain;
         this.username = null;
-        this.choice_buttons = [];
-        this.user_choice = null;
         this.enemy_choice = null;
-        this.game_eval = null;
         this.game_history = [];
-
-        this.selected_choice_dom_button = null;
-
-        // mode switch button
-        domHomeSwitchButton.onclick = () => {
-            this.toggleMode();
-        };
 
         // start page username form submit
         domHomeForm.onsubmit = () => {
@@ -110,19 +82,24 @@ class StonePaperScissorGame {
             this.exitGame();
         };
 
-        // inject user choice buttons into the user choice container div
-        for (let i = 0; i < this.gameService.HANDS.length; i++) {
-            const choice = this.gameService.HANDS[i];
-            const choiceButton = createUserChoiceButton(choice);
-            this.choice_buttons.push(choiceButton);
-            domGameHand.appendChild(choiceButton);
-        }
+        domGameHandSchere.onclick = () => {
+            this.chooseMove('Schere');
+        };
 
-        // listen for bubbling click events
-        domGameHand.onclick = (event) => {
-            if (event.target.nodeName === 'BUTTON') {
-                this.chooseMove(event.target.dataset.choiceName);
-            }
+        domGameHandStein.onclick = () => {
+            this.chooseMove('Stein');
+        };
+
+        domGameHandPapier.onclick = () => {
+            this.chooseMove('Papier');
+        };
+
+        domGameHandBrunnen.onclick = () => {
+            this.chooseMove('Brunnen');
+        };
+
+        domGameHandStreichholz.onclick = () => {
+            this.chooseMove('Streichholz');
         };
 
         this.updateView();
@@ -154,38 +131,24 @@ class StonePaperScissorGame {
             throw new Error('Invalider Spielzustand!');
         }
 
-        this.user_choice = choice;
-
         // change into battle mode until the enemy has choosen his move
         this.state = stateBattle;
         this.updateView();
 
         this.gameService.evaluateHand(this.username, choice, (result) => {
             this.enemy_choice = result.systemHand;
-            this.game_eval = result.gameEval;
             this.game_history.push(result);
 
             this.state = stateTimeout;
             this.updateView();
 
             setTimeout(() => {
-                this.user_choice = null;
                 this.enemy_choice = null;
-                this.game_eval = null;
-                this.selected_choice_dom_button = null;
 
                 this.state = stateChooseMove;
                 this.updateView();
             }, gameDelay);
         });
-    }
-
-    toggleMode() {
-        if (this.state === stateMain) {
-            const isOnline = this.gameService.isConnected();
-            this.gameService.setConnected(!isOnline);
-            this.updateView();
-        }
     }
 
     updateView() {
@@ -215,66 +178,38 @@ class StonePaperScissorGame {
             }
             case stateChooseMove: {
                 domGameSwitchButton.disabled = false;
-
-                for (let i = 0; i < this.choice_buttons.length; i++) {
-                    const button = this.choice_buttons[i];
-                    button.disabled = false;
-                    button.classList.remove('selected_by_user', 'winning_choice', 'tie_choice', 'lost_choice');
-                }
-
-                domGameEnemyHand.classList.remove('winning_choice', 'tie_choice', 'lost_choice');
+                domGameHandSchere.disabled = false;
+                domGameHandStein.disabled = false;
+                domGameHandPapier.disabled = false;
+                domGameHandBrunnen.disabled = false;
+                domGameHandStreichholz.disabled = false;
 
                 domGameUsername.textContent = this.username;
                 domGameStatus.textContent = 'Du bist am Zug...';
                 domGameEnemyHand.textContent = '??';
+
                 this.updateGameScoreboard();
                 break;
             }
             case stateBattle: {
-                for (let i = 0; i < this.choice_buttons.length; i++) {
-                    const button = this.choice_buttons[i];
-                    button.disabled = true;
-
-                    if (button.dataset.choiceName === this.user_choice) {
-                        button.classList.add('selected_by_user');
-                        this.selected_choice_dom_button = button;
-                    }
-                }
                 domGameSwitchButton.disabled = true;
+                domGameHandSchere.disabled = true;
+                domGameHandStein.disabled = true;
+                domGameHandPapier.disabled = true;
+                domGameHandBrunnen.disabled = true;
+                domGameHandStreichholz.disabled = true;
 
                 domGameStatus.textContent = 'Gegner ist am Zug...';
                 this.updateGameScoreboard();
                 break;
             }
             case stateTimeout: {
-                for (let i = 0; i < this.choice_buttons.length; i++) {
-                    const button = this.choice_buttons[i];
-                    button.disabled = true;
-                }
                 domGameSwitchButton.disabled = true;
-
-                this.selected_choice_dom_button.classList.remove('selected_by_user');
-
-                switch (this.game_eval) {
-                    case RESULT_WIN: { // won
-                        this.selected_choice_dom_button.classList.add('winning_choice');
-                        domGameEnemyHand.classList.add('lost_choice');
-                        break;
-                    }
-                    case RESULT_TIE: { // tie
-                        this.selected_choice_dom_button.classList.add('tie_choice');
-                        domGameEnemyHand.classList.add('tie_choice');
-                        break;
-                    }
-                    case RESULT_LOSE: { // lost
-                        this.selected_choice_dom_button.classList.add('lost_choice');
-                        domGameEnemyHand.classList.add('winning_choice');
-                        break;
-                    }
-                    default: {
-                        throw new Error('unexpected value');
-                    }
-                }
+                domGameHandSchere.disabled = true;
+                domGameHandStein.disabled = true;
+                domGameHandPapier.disabled = true;
+                domGameHandBrunnen.disabled = true;
+                domGameHandStreichholz.disabled = true;
 
                 domGameStatus.textContent = 'Nächste Runde beginnt in Kürze';
                 domGameEnemyHand.textContent = this.enemy_choice;
@@ -291,32 +226,23 @@ class StonePaperScissorGame {
         this.gameService.getRankings((ranking) => {
             if (this.state === stateMain) {
                 if (ranking.length === 0) {
-                    domHomeRanking.innerHTML = `<li>Keine Einträge vorhanden.</li>`;
+                    domHomeRanking.innerHTML = '<li>Keine Einträge vorhanden.</li>';
                 } else {
-                    domHomeRanking.innerHTML = ranking.slice(0, 9).map(homeRankingHTMLString).join('');
+                    domHomeRanking.innerHTML = ranking.slice(0, 9).map(homeRankingElementHTMLString).join('');
                 }
             }
         });
     }
 
     updateGameScoreboard() {
-        // remove all the previous entries, except for the table header
-        // TODO
-        while (domGameHistory.childElementCount > 1) {
-            domGameHistory.removeChild(domGameHistory.lastElementChild);
-        }
-
-        // insert new entries
-        for (let i = 0; i < this.game_history.length; i++) {
-            const result = this.game_history[i];
-            const resultDomNode = createGameScoreboardEntryNode(result);
-            domGameHistory.appendChild(resultDomNode);
-        }
+        const header = `<tr>
+                            <th>Resultat</th>
+                            <th>Spieler</th>
+                            <th>Gegner</th>
+                        </tr>`;
+        domGameHistory.innerHTML = header + this.game_history.map(gameHistoryRowHTMLString).join('');
     }
 }
 
-// wait for the document to be ready
-document.addEventListener('DOMContentLoaded', () => {
-    const game = new StonePaperScissorGame(libGameService);
-    game.updateView();
-});
+const game = new Game(libGameService);
+game.updateView();
