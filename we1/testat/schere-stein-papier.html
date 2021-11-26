@@ -6,37 +6,29 @@
     <link rel="stylesheet" href="styles/global.css">
 </head>
 <body>
-<section id="home">
+<section id="home-section">
     <button id="home-switch-button">Wechsle zu Server</button>
     <h2>Rangliste</h2>
-    <ul id="home-ranking"></ul>
+    <ul id="home-ranking-list"></ul>
     <hr>
     <p>Starten Sie ein neues Spiel</p>
     <form id="home-form">
         <p>
-            <label for="home-form-name">Name</label>
-            <input type="text" id="home-form-name" required>
+            <label for="home-form-name-input">Name</label>
+            <input type="text" id="home-form-name-input" required>
         </p>
         <button type="submit">Spiel Starten</button>
     </form>
 </section>
-<section id="game">
-    <p>
-        <span id="game-username">?</span>! Wähle deine Hand!
-    </p>
-    <div>
-        <button id="game-hand-scissors">Schere</button>
-        <button id="game-hand-stone">Stein</button>
-        <button id="game-hand-paper">Papier</button>
-        <button id="game-hand-fountain">Brunnen</button>
-        <button id="game-hand-match">Streichholz</button>
-    </div>
-    <p id="game-status"></p>
-    <p id="game-system-hand"></p>
+<section id="game-section">
+    <p id="game-username-paragraph"></p>
+    <div id="game-player-hand-div"></div>
+    <p id="game-status-paragraph"></p>
+    <p id="game-system-hand-paragraph"></p>
     <button id="game-switch-button">Zurück zum Ranking</button>
     <hr>
     <h2>History</h2>
-    <table id="game-history">
+    <table id="game-history-table">
         <tr>
             <th>Resultat</th>
             <th>Spieler</th>

@@ -1,11 +1,11 @@
 const DELAY_MS = 1000;
-const playerStats = {};
+const PLAYER_STATS = {};
 
 function getRankingsFromPlayerStats() {
-    const playerNames = Object.keys(playerStats);
+    const playerNames = Object.keys(PLAYER_STATS);
     let ranking = [];
     playerNames.forEach((playerName) => {
-        const playerInfo = playerStats[playerName];
+        const playerInfo = PLAYER_STATS[playerName];
         if (ranking[playerInfo.win] === undefined) {
             ranking[playerInfo.win] = {
                 rank: null,
@@ -45,7 +45,7 @@ const RESULT_WIN = -1;
 const RESULT_TIE = 0;
 const RESULT_LOSE = 1;
 
-const evalLookup = {
+const GAME_EVAL_LOOKUP = {
     Schere: {
         Schere: RESULT_TIE,
         Stein: RESULT_LOSE,
@@ -83,24 +83,26 @@ const evalLookup = {
     },
 };
 
+const GAME_EVAL_ACTION = {
+    '-1': (playerName) => PLAYER_STATS[playerName].win++,
+    1: (playerName) => PLAYER_STATS[playerName].lost++,
+    0: () => PLAYER_STATS,
+};
+
 function getGameEval(playerHand, systemHand) {
-    return evalLookup[playerHand][systemHand];
+    return GAME_EVAL_LOOKUP[playerHand][systemHand];
 }
 
 export async function evaluateHand(playerName, playerHand, gameRecordHandlerCallbackFn) {
     const systemHand = HANDS[Math.floor(Math.random() * HANDS.length)];
     const gameEval = getGameEval(playerHand, systemHand);
-    if (playerStats[playerName] === undefined) {
-        playerStats[playerName] = {
+    if (PLAYER_STATS[playerName] === undefined) {
+        PLAYER_STATS[playerName] = {
             user: playerName,
             win: 0,
             lost: 0,
         };
     }
-    if (gameEval === RESULT_WIN) {
-        playerStats[playerName].win++;
-    } else if (gameEval === RESULT_LOSE) {
-        playerStats[playerName].lost++;
-    }
+    GAME_EVAL_ACTION[gameEval](playerName);
     setTimeout(() => gameRecordHandlerCallbackFn({playerHand, systemHand, gameEval}), DELAY_MS);
 }

@@ -3,14 +3,6 @@ import {HANDS, getRankings, evaluateHand, isConnected} from './game-service.js';
 // Constants / Configs
 const DELAY_MS = 2000;
 
-const HAND = {
-    SCISSORS: HANDS[0],
-    STONE: HANDS[1],
-    PAPER: HANDS[2],
-    FOUNTAIN: HANDS[3],
-    MATCH: HANDS[4],
-};
-
 const STATE = {
     HOME: 'home',
     PLAYER_HAND: 'player_hand',
@@ -31,26 +23,26 @@ let systemHand = null;
 let gameHistory = [];
 
 // View
-const domHome = document.querySelector('#home');
+const domHomeSection = document.querySelector('#home-section');
 const domHomeSwitchButton = document.querySelector('#home-switch-button');
-const domHomeRanking = document.querySelector('#home-ranking');
+const domHomeRankingList = document.querySelector('#home-ranking-list');
 const domHomeForm = document.querySelector('#home-form');
-const domHomeFormName = document.querySelector('#home-form-name');
+const domHomeFormNameInput = document.querySelector('#home-form-name-input');
 
-const domGame = document.querySelector('#game');
-const domGameUsername = document.querySelector('#game-username');
-const domGameHandScissors = document.querySelector('#game-hand-scissors');
-const domGameHandStone = document.querySelector('#game-hand-stone');
-const domGameHandPaper = document.querySelector('#game-hand-paper');
-const domGameHandFountain = document.querySelector('#game-hand-fountain');
-const domGameHandMatch = document.querySelector('#game-hand-match');
-const domGameStatus = document.querySelector('#game-status');
-const domGameSystemHand = document.querySelector('#game-system-hand');
+const domGameSection = document.querySelector('#game-section');
+const domGameUsernameParagraph = document.querySelector('#game-username-paragraph');
+const domGamePlayerHandDiv = document.querySelector('#game-player-hand-div');
+const domGameStatusParagraph = document.querySelector('#game-status-paragraph');
+const domGameSystemHandParagraph = document.querySelector('#game-system-hand-paragraph');
 const domGameSwitchButton = document.querySelector('#game-switch-button');
-const domGameHistory = document.querySelector('#game-history');
+const domGameHistoryTable = document.querySelector('#game-history-table');
 
 function homeRankingElementHTMLString(ranking) {
     return `<li>${ranking.rank}. Rang mit ${ranking.wins} Siegen : ${ranking.players.join(', ')}</li>`;
+}
+
+function gamePlayerHandButtonHTMLString(playerHand) {
+    return `<button>${playerHand}</button>`;
 }
 
 function gameHistoryRowHTMLString(ranking) {
@@ -63,91 +55,92 @@ function gameHistoryRowHTMLString(ranking) {
 
 function disableGameButtons() {
     domGameSwitchButton.disabled = true;
-    domGameHandScissors.disabled = true;
-    domGameHandStone.disabled = true;
-    domGameHandPaper.disabled = true;
-    domGameHandFountain.disabled = true;
-    domGameHandMatch.disabled = true;
+    const playerHands = domGamePlayerHandDiv.getElementsByTagName('button');
+    for (let i = 0; i < playerHands.length; i++) {
+        playerHands[i].disabled = true;
+    }
 }
 
 function enableGameButtons() {
     domGameSwitchButton.disabled = false;
-    domGameHandScissors.disabled = false;
-    domGameHandStone.disabled = false;
-    domGameHandPaper.disabled = false;
-    domGameHandFountain.disabled = false;
-    domGameHandMatch.disabled = false;
+    const playerHands = domGamePlayerHandDiv.getElementsByTagName('button');
+    for (let i = 0; i < playerHands.length; i++) {
+        playerHands[i].disabled = false;
+    }
 }
 
-function updateHomeRanking() {
+function updateHomeRankingList() {
     getRankings((ranking) => {
         if (activeState === STATE.HOME) {
             if (ranking.length === 0) {
-                domHomeRanking.innerHTML = '<li>Keine Einträge vorhanden.</li>';
+                domHomeRankingList.innerHTML = '<li>Keine Einträge vorhanden.</li>';
             } else {
-                domHomeRanking.innerHTML = ranking.slice(0, 9).map(homeRankingElementHTMLString).join('');
+                domHomeRankingList.innerHTML = ranking.slice(0, 9).map(homeRankingElementHTMLString).join('');
             }
         }
     });
 }
 
-function updateGameHistory() {
+function updateGameHistoryTable() {
     const header = `<tr>
                         <th>Resultat</th>
                         <th>Spieler</th>
                         <th>Gegner</th>
                     </tr>`;
-    domGameHistory.innerHTML = header + gameHistory.map(gameHistoryRowHTMLString).join('');
+    domGameHistoryTable.innerHTML = header + gameHistory.map(gameHistoryRowHTMLString).join('');
+}
+
+function initGamePlayerHandDiv() {
+    domGamePlayerHandDiv.innerHTML = HANDS.map(gamePlayerHandButtonHTMLString).join('');
 }
 
 function updateViewStateHome() {
-    updateHomeRanking();
-    domHomeFormName.value = '';
+    updateHomeRankingList();
+    domHomeFormNameInput.value = '';
 }
 
 function updateViewStatePlayerHand() {
     enableGameButtons();
-    domGameUsername.textContent = username;
-    domGameStatus.textContent = 'Du bist dran...';
-    domGameSystemHand.textContent = '';
-    updateGameHistory();
+    domGameUsernameParagraph.textContent = `${username}! Wähle deine Hand!`;
+    domGameStatusParagraph.textContent = 'Du bist dran...';
+    domGameSystemHandParagraph.textContent = '';
+    updateGameHistoryTable();
 }
 
 function updateViewStateSystemHand() {
     disableGameButtons();
-    domGameStatus.textContent = 'Computer wählt eine Hand...';
-    updateGameHistory();
+    domGameStatusParagraph.textContent = 'Computer wählt eine Hand...';
+    updateGameHistoryTable();
 }
 
 function updateViewStateWaiting() {
     disableGameButtons();
-    domGameStatus.textContent = 'Nächste Runde startet gleich';
-    domGameSystemHand.textContent = `Computer Hand: ${systemHand}`;
-    updateGameHistory();
+    domGameStatusParagraph.textContent = 'Nächste Runde startet gleich';
+    domGameSystemHandParagraph.textContent = `Computer Hand: ${systemHand}`;
+    updateGameHistoryTable();
 }
+
+const STATE_ACTION = {
+    home: () => updateViewStateHome(),
+    player_hand: () => updateViewStatePlayerHand(),
+    system_hand: () => updateViewStateSystemHand(),
+    waiting: () => updateViewStateWaiting(),
+};
 
 function updateView() {
     if (activeState === STATE.HOME) {
-        domHome.classList.remove('hidden');
-        domGame.classList.add('hidden');
+        domHomeSection.classList.remove('hidden');
+        domGameSection.classList.add('hidden');
     } else {
-        domHome.classList.add('hidden');
-        domGame.classList.remove('hidden');
+        domHomeSection.classList.add('hidden');
+        domGameSection.classList.remove('hidden');
     }
-    if (activeState === STATE.HOME) {
-        updateViewStateHome();
-    } else if (activeState === STATE.PLAYER_HAND) {
-        updateViewStatePlayerHand();
-    } else if (activeState === STATE.SYSTEM_HAND) {
-        updateViewStateSystemHand();
-    } else if (activeState === STATE.WAITING) {
-        updateViewStateWaiting();
-    }
+    STATE_ACTION[activeState]();
 }
 
 // Controller
 function startGame() {
-    username = domHomeFormName.value;
+    username = domHomeFormNameInput.value;
     activeState = STATE.PLAYER_HAND;
     updateView();
 }
@@ -159,10 +152,10 @@ function stopGame() {
     updateView();
 }
 
-function chooseHand(hand) {
+function chooseHand(playerHand) {
     activeState = STATE.SYSTEM_HAND;
     updateView();
-    evaluateHand(username, hand, (result) => {
+    evaluateHand(username, playerHand, (result) => {
         systemHand = result.systemHand;
         gameHistory.push(result);
         activeState = STATE.WAITING;
@@ -175,39 +168,25 @@ function chooseHand(hand) {
     });
 }
 
-domHomeSwitchButton.onclick = () => {
+domHomeSwitchButton.addEventListener('click', () => {
     isConnected();
-};
+});
 
-domHomeForm.onsubmit = () => {
+domHomeForm.addEventListener('submit', (event) => {
+    event.preventDefault();
     startGame();
-    // to stop page from reloading
-    return false;
-};
+});
 
-domGameSwitchButton.onclick = () => {
+domGameSwitchButton.addEventListener('click', () => {
     stopGame();
-};
+});
 
-domGameHandScissors.onclick = () => {
-    chooseHand(HAND.SCISSORS);
-};
-
-domGameHandStone.onclick = () => {
-    chooseHand(HAND.STONE);
-};
-
-domGameHandPaper.onclick = () => {
-    chooseHand(HAND.PAPER);
-};
-
-domGameHandFountain.onclick = () => {
-    chooseHand(HAND.FOUNTAIN);
-};
-
-domGameHandMatch.onclick = () => {
-    chooseHand(HAND.MATCH);
-};
+// Event bubbling for player hands
+domGamePlayerHandDiv.addEventListener('click', (event) => {
+    const playerHand = event.target.innerHTML;
+    chooseHand(playerHand);
+});
 
 // Init
 updateView();
+initGamePlayerHandDiv();
