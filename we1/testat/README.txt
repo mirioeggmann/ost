@@ -1,9 +1,11 @@
 Infos:
 - CSS Styling zur Verschönerung folgt erst im nächsten Schritt
-- 4 warnings vorhanden, alle wegen "action map" anstelle von if-else <- hierzu frage
 - isConnected bzw. die Server Version wird erst im nächsten Schritt implementiert
 
-Fragen:
-- In updateView(), wie soll dort eine action map anstelle von if-else verwendet werden? (warnings dort)
-- Kann wirklich ein <p> um einen Input und ein Label gesetzt werden? Wie in der Mozilla doc gezeigt?
-https://developer.mozilla.org/en-US/docs/Learn/Forms/How_to_structure_a_web_form
+Im Video gibt es noch einen Countdown der die Wartezeit anzeigt
+Im Video werden für das Resultat die folgenden Zeichen verwendet: '✓', '=' und '✗'
+Die Zeichen '✓', '=' und '✗' könnte man im CSS mit ::before einbinden
+
+Und dann pro Status (win, lose, draw) des Buttons eine eigene Regel
+
+So könnte man z.B. auch gleich noch die Farbe ändern etc.

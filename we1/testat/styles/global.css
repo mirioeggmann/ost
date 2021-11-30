@@ -1,3 +1,15 @@
 .hidden {
     display: none;
 }
+
+.game-history-result-win {
+    color: green;
+}
+
+.game-history-result-tie {
+    color: grey;
+}
+
+.game-history-result-lose {
+    color: red;
+}

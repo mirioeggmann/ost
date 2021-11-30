@@ -10,10 +10,16 @@ const STATE = {
     WAITING: 'waiting',
 };
 
-const RESULT_LOOKUP = {
-    '-1': 'Gewonnen',
-    0: 'Unentschieden',
-    1: 'Verloren',
+const RESULT_SYMBOL_LOOKUP = {
+    '-1': '✓',
+    0: '=',
+    1: '✗',
+};
+
+const RESULT_CLASS_LOOKUP = {
+    '-1': 'game-history-result-win',
+    0: 'game-history-result-tie',
+    1: 'game-history-result-lose',
 };
 
 // Model / State
@@ -47,7 +53,7 @@ function gamePlayerHandButtonHTMLString(playerHand) {
 
 function gameHistoryRowHTMLString(ranking) {
     return `<tr>
-                <td>${RESULT_LOOKUP[ranking.gameEval]}</td>
+                <td class="${RESULT_CLASS_LOOKUP[ranking.gameEval]}">${RESULT_SYMBOL_LOOKUP[ranking.gameEval]}</td>
                 <td>${ranking.playerHand}</td>
                 <td>${ranking.systemHand}</td>
             </tr>`;
