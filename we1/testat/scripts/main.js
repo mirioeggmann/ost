@@ -80,6 +80,18 @@ function enableGameButtons() {
     }
 }
 
+function countDown() {
+    let counter = 2;
+    const countdown = setInterval(() => {
+        if (counter <= 0) {
+            clearInterval(countdown);
+        } else {
+            domGameStatusParagraph.textContent = counter;
+        }
+        counter -= 1;
+    }, DELAY_MS / 3);
+}
+
 function updateHomeRankingList() {
     getRankings((ranking) => {
         if (activeState === STATE.HOME) {
@@ -114,19 +126,19 @@ function updateViewStatePlayerHand() {
     enableGameButtons();
     domGameUsernameParagraph.textContent = `${username}! Wähle deine Hand!`;
     domGameStatusParagraph.textContent = 'Du bist dran...';
-    domGameSystemHandParagraph.textContent = '';
+    domGameSystemHandParagraph.textContent = 'Computer Hand: ?';
     updateGameHistoryTable();
 }
 
 function updateViewStateSystemHand() {
     disableGameButtons();
-    domGameStatusParagraph.textContent = 'Computer wählt eine Hand...';
+    countDown();
     updateGameHistoryTable();
 }
 
 function updateViewStateWaiting() {
     disableGameButtons();
-    domGameStatusParagraph.textContent = 'Nächste Runde startet gleich';
+    domGameStatusParagraph.textContent = 'VS';
     domGameSystemHandParagraph.textContent = `Computer Hand: ${systemHand}`;
     updateGameHistoryTable();
 }
