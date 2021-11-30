@@ -22,7 +22,7 @@ const RESULT_CLASS_LOOKUP = {
     1: 'game-history-result-lose',
 };
 
-const CONNECTED_LOOKUP = {
+const MODE_LOOKUP = {
     true: 'Wechsle zu Lokal',
     false: 'Wechsle zu Server',
 };
@@ -36,7 +36,7 @@ let gameHistory = [];
 
 // View
 const domHomeSection = document.querySelector('#home-section');
-const domHomeSwitchButton = document.querySelector('#home-switch-button');
+const domHomeModeButton = document.querySelector('#home-mode-button');
 const domHomeRankingList = document.querySelector('#home-ranking-list');
 const domHomeForm = document.querySelector('#home-form');
 const domHomeFormNameInput = document.querySelector('#home-form-name-input');
@@ -47,7 +47,7 @@ const domGamePlayerHandDiv = document.querySelector('#game-player-hand-div');
 const domGamePlayerHandParagraph = document.querySelector('#game-player-hand-paragraph');
 const domGameStatusParagraph = document.querySelector('#game-status-paragraph');
 const domGameSystemHandParagraph = document.querySelector('#game-system-hand-paragraph');
-const domGameSwitchButton = document.querySelector('#game-switch-button');
+const domGameReturnButton = document.querySelector('#game-return-button');
 const domGameHistoryTable = document.querySelector('#game-history-table');
 
 function homeRankingElementHTMLString(ranking) {
@@ -67,7 +67,7 @@ function gameHistoryRowHTMLString(ranking) {
 }
 
 function disableGameButtons() {
-    domGameSwitchButton.disabled = true;
+    domGameReturnButton.disabled = true;
     const playerHands = domGamePlayerHandDiv.getElementsByTagName('button');
     for (let i = 0; i < playerHands.length; i++) {
         playerHands[i].disabled = true;
@@ -75,7 +75,7 @@ function disableGameButtons() {
 }
 
 function enableGameButtons() {
-    domGameSwitchButton.disabled = false;
+    domGameReturnButton.disabled = false;
     const playerHands = domGamePlayerHandDiv.getElementsByTagName('button');
     for (let i = 0; i < playerHands.length; i++) {
         playerHands[i].disabled = false;
@@ -168,7 +168,7 @@ function updateView() {
 // Controller
 function changeMode() {
     setConnected(!isConnected());
-    domHomeSwitchButton.textContent = CONNECTED_LOOKUP[isConnected()];
+    domHomeModeButton.textContent = MODE_LOOKUP[isConnected()];
     updateView();
 }
 
@@ -202,7 +202,7 @@ function chooseHand() {
     });
 }
 
-domHomeSwitchButton.addEventListener('click', () => {
+domHomeModeButton.addEventListener('click', () => {
     changeMode();
 });
 
@@ -211,7 +211,7 @@ domHomeForm.addEventListener('submit', (event) => {
     startGame();
 });
 
-domGameSwitchButton.addEventListener('click', () => {
+domGameReturnButton.addEventListener('click', () => {
     stopGame();
 });
 
