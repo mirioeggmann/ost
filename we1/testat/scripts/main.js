@@ -1,4 +1,4 @@
-import {HANDS, getRankings, evaluateHand, isConnected} from './game-service.js';
+import {HANDS, getRankings, evaluateHand, isConnected, setConnected} from './game-service.js';
 
 // Constants / Configs
 const DELAY_MS = 2000;
@@ -20,6 +20,11 @@ const RESULT_CLASS_LOOKUP = {
     '-1': 'game-history-result-win',
     0: 'game-history-result-tie',
     1: 'game-history-result-lose',
+};
+
+const CONNECTED_LOOKUP = {
+    true: 'Wechsle zu Lokal',
+    false: 'Wechsle zu Server',
 };
 
 // Model / State
@@ -174,8 +179,14 @@ function chooseHand(playerHand) {
     });
 }
 
+function changeMode() {
+    setConnected(!isConnected());
+    domHomeSwitchButton.textContent = CONNECTED_LOOKUP[isConnected()];
+    updateView();
+}
+
 domHomeSwitchButton.addEventListener('click', () => {
-    isConnected();
+    changeMode();
 });
 
 domHomeForm.addEventListener('submit', (event) => {

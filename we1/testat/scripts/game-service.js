@@ -1,11 +1,11 @@
 const DELAY_MS = 1000;
 const PLAYER_STATS = {};
 
-function getRankingsFromPlayerStats() {
-    const playerNames = Object.keys(PLAYER_STATS);
+function getRankingsFromPlayerStats(playerStats) {
+    const playerNames = Object.keys(playerStats);
     let ranking = [];
     playerNames.forEach((playerName) => {
-        const playerInfo = PLAYER_STATS[playerName];
+        const playerInfo = playerStats[playerName];
         if (ranking[playerInfo.win] === undefined) {
             ranking[playerInfo.win] = {
                 rank: null,
@@ -37,7 +37,14 @@ export function isConnected() {
 }
 
 export async function getRankings(rankingsCallbackHandlerFn) {
-    const rankingsArray = getRankingsFromPlayerStats();
+    let playerStats;
+    if (isConnected()) {
+        const response = await fetch('https://stone.dev.ifs.hsr.ch/ranking');
+        playerStats = await response.json();
+    } else {
+        playerStats = PLAYER_STATS;
+    }
+    const rankingsArray = getRankingsFromPlayerStats(playerStats);
     setTimeout(() => rankingsCallbackHandlerFn(rankingsArray), DELAY_MS);
 }
 
@@ -94,15 +101,23 @@ function getGameEval(playerHand, systemHand) {
 }
 
 export async function evaluateHand(playerName, playerHand, gameRecordHandlerCallbackFn) {
-    const systemHand = HANDS[Math.floor(Math.random() * HANDS.length)];
-    const gameEval = getGameEval(playerHand, systemHand);
-    if (PLAYER_STATS[playerName] === undefined) {
-        PLAYER_STATS[playerName] = {
-            user: playerName,
-            win: 0,
-            lost: 0,
-        };
+    if (isConnected()) {
+        const response = await fetch(`https://stone.dev.ifs.hsr.ch/play?playerName=${playerName}&playerHand=${playerHand}`);
+        const json = await response.json();
+        const systemHand = json.choice;
+        const gameEval = getGameEval(playerHand, systemHand);
+        setTimeout(() => gameRecordHandlerCallbackFn({playerHand, systemHand, gameEval}), DELAY_MS);
+    } else {
+        const systemHand = HANDS[Math.floor(Math.random() * HANDS.length)];
+        const gameEval = getGameEval(playerHand, systemHand);
+        if (PLAYER_STATS[playerName] === undefined) {
+            PLAYER_STATS[playerName] = {
+                user: playerName,
+                win: 0,
+                lost: 0,
+            };
+        }
+        GAME_EVAL_ACTION[gameEval](playerName);
+        setTimeout(() => gameRecordHandlerCallbackFn({playerHand, systemHand, gameEval}), DELAY_MS);
     }
-    GAME_EVAL_ACTION[gameEval](playerName);
-    setTimeout(() => gameRecordHandlerCallbackFn({playerHand, systemHand, gameEval}), DELAY_MS);
 }
