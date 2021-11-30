@@ -95,12 +95,13 @@ function countDown() {
 }
 
 function updateHomeRankingList() {
+    domHomeRankingList.innerHTML = '<p>Rangliste wird geladen...</p>';
     getRankings((ranking) => {
         if (activeState === STATE.HOME) {
             if (ranking.length === 0) {
                 domHomeRankingList.innerHTML = '<li>Keine Einträge vorhanden.</li>';
             } else {
-                domHomeRankingList.innerHTML = ranking.slice(0, 9).map(homeRankingElementHTMLString).join('');
+                domHomeRankingList.innerHTML = ranking.slice(0, 10).map(homeRankingElementHTMLString).join('');
             }
         }
     });
@@ -165,6 +166,12 @@ function updateView() {
 }
 
 // Controller
+function changeMode() {
+    setConnected(!isConnected());
+    domHomeSwitchButton.textContent = CONNECTED_LOOKUP[isConnected()];
+    updateView();
+}
+
 function startGame() {
     username = domHomeFormNameInput.value;
     activeState = STATE.PLAYER_HAND;
@@ -193,12 +200,6 @@ function chooseHand() {
             updateView();
         }, DELAY_MS);
     });
-}
-
-function changeMode() {
-    setConnected(!isConnected());
-    domHomeSwitchButton.textContent = CONNECTED_LOOKUP[isConnected()];
-    updateView();
 }
 
 domHomeSwitchButton.addEventListener('click', () => {
