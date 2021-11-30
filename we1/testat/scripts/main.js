@@ -31,6 +31,7 @@ const CONNECTED_LOOKUP = {
 let activeState = STATE.HOME;
 let username = null;
 let systemHand = null;
+let playerHand = null;
 let gameHistory = [];
 
 // View
@@ -43,6 +44,7 @@ const domHomeFormNameInput = document.querySelector('#home-form-name-input');
 const domGameSection = document.querySelector('#game-section');
 const domGameUsernameParagraph = document.querySelector('#game-username-paragraph');
 const domGamePlayerHandDiv = document.querySelector('#game-player-hand-div');
+const domGamePlayerHandParagraph = document.querySelector('#game-player-hand-paragraph');
 const domGameStatusParagraph = document.querySelector('#game-status-paragraph');
 const domGameSystemHandParagraph = document.querySelector('#game-system-hand-paragraph');
 const domGameSwitchButton = document.querySelector('#game-switch-button');
@@ -52,8 +54,8 @@ function homeRankingElementHTMLString(ranking) {
     return `<li>${ranking.rank}. Rang mit ${ranking.wins} Siegen : ${ranking.players.join(', ')}</li>`;
 }
 
-function gamePlayerHandButtonHTMLString(playerHand) {
-    return `<button>${playerHand}</button>`;
+function gamePlayerHandButtonHTMLString(gameHand) {
+    return `<button>${gameHand}</button>`;
 }
 
 function gameHistoryRowHTMLString(ranking) {
@@ -86,7 +88,7 @@ function countDown() {
         if (counter <= 0) {
             clearInterval(countdown);
         } else {
-            domGameStatusParagraph.textContent = counter;
+            domGameStatusParagraph.textContent = `Nächste Runde in ${counter}`;
         }
         counter -= 1;
     }, DELAY_MS / 3);
@@ -125,21 +127,22 @@ function updateViewStateHome() {
 function updateViewStatePlayerHand() {
     enableGameButtons();
     domGameUsernameParagraph.textContent = `${username}! Wähle deine Hand!`;
-    domGameStatusParagraph.textContent = 'Du bist dran...';
+    domGamePlayerHandParagraph.textContent = 'Player Hand: ?';
+    domGameStatusParagraph.textContent = 'VS';
     domGameSystemHandParagraph.textContent = 'Computer Hand: ?';
     updateGameHistoryTable();
 }
 
 function updateViewStateSystemHand() {
     disableGameButtons();
-    countDown();
+    domGamePlayerHandParagraph.textContent = `Player Hand: ${playerHand}`;
     updateGameHistoryTable();
 }
 
 function updateViewStateWaiting() {
     disableGameButtons();
-    domGameStatusParagraph.textContent = 'VS';
     domGameSystemHandParagraph.textContent = `Computer Hand: ${systemHand}`;
+    countDown();
     updateGameHistoryTable();
 }
 
@@ -175,7 +178,7 @@ function stopGame() {
     updateView();
 }
 
-function chooseHand(playerHand) {
+function chooseHand() {
     activeState = STATE.SYSTEM_HAND;
     updateView();
     evaluateHand(username, playerHand, (result) => {
@@ -185,6 +188,7 @@ function chooseHand(playerHand) {
         updateView();
         setTimeout(() => {
             systemHand = null;
+            playerHand = null;
             activeState = STATE.PLAYER_HAND;
             updateView();
         }, DELAY_MS);
@@ -212,8 +216,8 @@ domGameSwitchButton.addEventListener('click', () => {
 
 // Event bubbling for player hands
 domGamePlayerHandDiv.addEventListener('click', (event) => {
-    const playerHand = event.target.innerHTML;
-    chooseHand(playerHand);
+    playerHand = event.target.innerHTML;
+    chooseHand();
 });
 
 // Init
