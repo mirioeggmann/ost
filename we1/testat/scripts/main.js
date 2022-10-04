@@ -94,9 +94,9 @@ function countDown() {
     }, DELAY_MS / 3);
 }
 
-function updateHomeRankingList() {
+async function updateHomeRankingList() {
     domHomeRankingList.innerHTML = '<p>Rangliste wird geladen...</p>';
-    getRankings((ranking) => {
+    await getRankings((ranking) => {
         if (activeState === STATE.HOME) {
             if (ranking.length === 0) {
                 domHomeRankingList.innerHTML = '<li>Keine Einträge vorhanden.</li>';
@@ -120,8 +120,8 @@ function initGamePlayerHandDiv() {
     domGamePlayerHandDiv.innerHTML = HANDS.map(gamePlayerHandButtonHTMLString).join('');
 }
 
-function updateViewStateHome() {
-    updateHomeRankingList();
+async function updateViewStateHome() {
+    await updateHomeRankingList();
     domHomeFormNameInput.value = '';
 }
 
@@ -185,10 +185,10 @@ function stopGame() {
     updateView();
 }
 
-function chooseHand() {
+async function chooseHand() {
     activeState = STATE.SYSTEM_HAND;
     updateView();
-    evaluateHand(username, playerHand, (result) => {
+    await evaluateHand(username, playerHand, (result) => {
         systemHand = result.systemHand;
         gameHistory.push(result);
         activeState = STATE.WAITING;
@@ -216,9 +216,9 @@ domGameReturnButton.addEventListener('click', () => {
 });
 
 // Event bubbling for player hands
-domGamePlayerHandDiv.addEventListener('click', (event) => {
+domGamePlayerHandDiv.addEventListener('click', async (event) => {
     playerHand = event.target.innerHTML;
-    chooseHand();
+    await chooseHand();
 });
 
 // Init

@@ -104,6 +104,7 @@ export async function evaluateHand(playerName, playerHand, gameRecordHandlerCall
     if (isConnected()) {
         const response = await fetch(`https://stone.dev.ifs.hsr.ch/play?playerName=${playerName}&playerHand=${playerHand}`);
         const json = await response.json();
+        /** @namespace json.choice */
         const systemHand = json.choice;
         const gameEval = getGameEval(playerHand, systemHand);
         setTimeout(() => gameRecordHandlerCallbackFn({playerHand, systemHand, gameEval}), DELAY_MS);
