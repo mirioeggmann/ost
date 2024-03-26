@@ -2,11 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def plot_results(data, true_labels, predicted_labels):
+def plot_results(inputs, true_labels, predicted_labels):
     """Plot results.
 
     Args:
-        data: numpy array with dimensions (n_samples, n_inputs)
+        inputs: numpy array with dimensions (n_samples, n_inputs)
         true_labels: numpy array with dimensions (n_samples, n_outputs)
         predicted_labels: numpy array with dimensions (n_samples, n_outputs)
     """
@@ -23,8 +23,8 @@ def plot_results(data, true_labels, predicted_labels):
         )[0]
         if ind.size:
             plt.scatter(
-                data[ind, 0],
-                data[ind, 1],
+                inputs[ind, 0],
+                inputs[ind, 1],
                 c=colors[label],
                 marker="o",
                 label=legend[label],
@@ -37,8 +37,8 @@ def plot_results(data, true_labels, predicted_labels):
         )[0]
         if ind.size:
             plt.scatter(
-                data[ind, 0],
-                data[ind, 1],
+                inputs[ind, 0],
+                inputs[ind, 1],
                 c=colors[label + 2],
                 marker="o",
                 label=legend[label + 2],

@@ -113,4 +113,4 @@ def main(data_path):
 
 
 if __name__ == '__main__':
-    main('../Advertising.csv')
+    main('./Advertising.csv')

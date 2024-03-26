@@ -26,7 +26,6 @@ class DataSet:
         self._inputs = np.squeeze(inputs)
         self._labels = np.squeeze(labels)
 
-        self.epochs_completed = 0
         self._index_in_epoch = 0
 
     def get_next_batch(self, batch_size=None):
@@ -36,7 +35,8 @@ class DataSet:
             batch_size: size of the batch
 
         Returns:
-            data and labels of this dataset
+            inputs: numpy array with dimensions (batch_size, n_inputs)
+            labels: numpy array with dimensions (batch_size, n_outputs)
         """
 
         if batch_size is None:
@@ -44,25 +44,25 @@ class DataSet:
 
         assert batch_size <= self.n_samples
 
+        if self.is_epoch_completed(batch_size):
+            self._index_in_epoch = 0
+            self._shuffle()
+
         start = self._index_in_epoch
         self._index_in_epoch += batch_size
-        if self._index_in_epoch > self.n_samples:
-            # Finished epoch
-            self.epochs_completed += 1
-
-            # Shuffle the data
-            perm = np.arange(self.n_samples)
-            np.random.shuffle(perm)
-            self._inputs = self._inputs[perm]
-            self._labels = self._labels[perm]
-
-            # Start next epoch
-            start = 0
-            self._index_in_epoch = batch_size
-
         end = self._index_in_epoch
 
         return self._inputs[start:end], self._labels[start:end]
+
+    def is_epoch_completed(self, batch_size):
+        end = self._index_in_epoch + batch_size
+        return end > self.n_samples
+
+    def _shuffle(self):
+        perm = np.arange(self.n_samples)
+        np.random.shuffle(perm)
+        self._inputs = self._inputs[perm]
+        self._labels = self._labels[perm]
 
 
 @dataclass
@@ -84,7 +84,7 @@ def read_datasets(path, linearly_separable=False):
                                 if False, linear non-separable dataset is loaded
 
         Returns:
-            dataSets object
+            DataSets object
     """
 
     VALIDATION_SIZE = 1000

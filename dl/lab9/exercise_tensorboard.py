@@ -8,8 +8,8 @@ Created on Mon Jan 18 10:44:44 2021
 
 import tensorflow as tf
 
-from tensorflow.keras.layers import Dense, Softmax
-from tensorflow.keras import Model
+from keras.layers import Dense, Softmax
+from keras import Model
 
 import numpy as np
 
@@ -106,7 +106,10 @@ def train_step(images, labels):
     
     train_loss(loss)
     train_accuracy(labels, predictions)
-  
+
+# Prepare TensorBoard
+#############################################################################
+
 # Validate the model
 @tf.function
 def valid_step(images, labels):
@@ -138,6 +141,22 @@ Histogram: Network weights, network bias
 Graph:     Graph illustration of your model
 Images:    12 misclassified validation images
 """
+scalar_log_dir = 'logs/1_run/scalar'
+hist_log_dir   = 'logs/1_run/hist'
+image_log_dir  = 'logs/1_run/image'
+func_log_dir   = 'logs/1_run/func'
+
+scalar_writer = tf.summary.create_file_writer(scalar_log_dir)
+histogram_writer = tf.summary.create_file_writer(hist_log_dir)
+image_writer = tf.summary.create_file_writer(image_log_dir)
+graph_writer = tf.summary.create_file_writer(func_log_dir)
+
+tf.summary.trace_on(graph=True)
+
+with graph_writer.as_default():
+    tf.summary.trace_export(name='MNISTClassifier', step=0, profiler_outdir=func_log_dir)
+
+tf.summary.trace_off()
 
 ###############################################################################
 #
@@ -171,6 +190,16 @@ for epoch in range(EPOCHS):
     Graph:     Graph illustration of your model
     Images:    12 misclassified validation images
     """
+    with scalar_writer.as_default():
+        tf.summary.scalar('Train Loss', train_loss.result(), step=epoch)
+        tf.summary.scalar('Train Accuracy', train_accuracy.result(), step=epoch)
+        tf.summary.scalar('Valid Loss', valid_loss.result(), step=epoch)
+        tf.summary.scalar('Valid Accuracy', valid_accuracy.result(), step=epoch)
+    #with image_writer.as_default():
+    #    tf.summary.image('Mislabeled Images', img_list, step=epoch)
+    with histogram_writer.as_default():
+        tf.summary.histogram('Weights', model.trainable_variables[0], step=epoch)
+        tf.summary.histogram('Bias', model.trainable_variables[1], step=epoch)
     
     print(
       'Epoch {:2d}, '.format(epoch+1),

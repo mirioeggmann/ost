@@ -74,8 +74,8 @@ def KNN(k, data, labels, t_data, t_labels=None):
 def main():
 
     # Loading Data
-    train_data = np.genfromtxt('..//KNN_Train.csv', delimiter=',', skip_header=1)
-    test_data  = np.genfromtxt('..//KNN_Test.csv', delimiter=',', skip_header=1)
+    train_data = np.genfromtxt('./KNN_Train.csv', delimiter=',', skip_header=1)
+    test_data  = np.genfromtxt('./KNN_Test.csv', delimiter=',', skip_header=1)
 
     X_train = train_data[:, :2]
     y_train = train_data[:, 2].astype(int)

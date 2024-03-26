@@ -7,9 +7,8 @@ Created on Mon Jan 18 10:44:44 2021
 """
 
 import tensorflow as tf
-
-from tensorflow.keras.layers import Dense, Softmax, ReLU
-from tensorflow.keras import Model
+from keras.layers import Dense, Softmax, ReLU
+from keras import Model
 
 import numpy as np
 
