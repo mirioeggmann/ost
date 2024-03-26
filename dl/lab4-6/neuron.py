@@ -21,7 +21,8 @@ def evaluate_neuron(x, w, b):
     assert w.shape == (2,)
     assert b.shape == (1,) or b.shape == ()
 
-    # TODO: add your code here
+    a = np.dot(x, w.T) + b
+    y = 1 / (1 + np.exp(-a))
 
     return y, a
 
@@ -36,7 +37,7 @@ def derivative_of_sigmoid(a):
         deriv: derivative (numpy array of size [m, n])
     """
 
-    # TODO: add your code here
+    deriv = np.exp(-a) / (1 + np.exp(-a)) ** 2
 
     return deriv
 
@@ -61,7 +62,8 @@ def loss_function(x, t, w, b):
     assert w.shape == (2,)
     assert b.shape == (1,) or b.shape == ()
 
-    # TODO: add your code here
+    y, _ = evaluate_neuron(x, w, b)
+    loss = 0.5 * np.mean((y - t)**2)
 
     return loss
 
@@ -87,7 +89,19 @@ def update_weights(x, t, w, b, lr):
     assert w.shape == (2,)
     assert b.shape == (1,) or b.shape == ()
 
-    # TODO: add your code here
+    y, a = evaluate_neuron(x, w, b)
+    dsig = derivative_of_sigmoid(a)
+
+    # Gradient
+    dJ_dw = np.zeros(2)
+    temp = (y - t) * dsig
+    dJ_dw[0] = np.mean(temp * x[:, 0])
+    dJ_dw[1] = np.mean(temp * x[:, 1])
+    dJ_db = np.mean(temp)
+
+    # Weight update
+    w_new = w - lr * dJ_dw
+    b_new = b - lr * dJ_db
 
     return w_new, b_new
 
@@ -113,7 +127,9 @@ def evaluate_prediction(x, t, w, b):
     assert w.shape == (2,)
     assert b.shape == (1,) or b.shape == ()
 
-    # TODO: add your code here
+    y, _ = evaluate_neuron(x, w, b)
+    pred = np.round(y)
+    perf = np.mean(t == pred) * 100.0
 
     return pred, perf
 
