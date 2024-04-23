@@ -67,7 +67,8 @@ def loss_function(x, t, w, b, Wt, bt):
     assert Wt.shape == (2, 2)
     assert bt.shape == (2,)
 
-    # TODO: add your code here
+    y, _, _, _ = evaluate_network(x, w, b, Wt, bt)
+    loss = 0.5 * np.mean((y - t) ** 2)
 
     return loss
 
@@ -97,7 +98,35 @@ def update_weights(x, t, w, b, Wt, bt, lr):
     assert Wt.shape == (2, 2)
     assert bt.shape == (2,)
 
-    # TODO: add your code here
+    y, a_y, h, a_h = evaluate_network(x, w, b, Wt, bt)
+    dsig_a_y = derivative_of_sigmoid(a_y)
+    dsig_a_h = derivative_of_sigmoid(a_h)
+
+    # Gradient of output layer
+    dJ_dw = np.zeros((2,))
+    tmp = (y - t) * dsig_a_y
+    dJ_dw[0] = np.mean(tmp * h[:, 0])
+    dJ_dw[1] = np.mean(tmp * h[:, 1])
+    dJ_db = np.mean(tmp)
+
+    # Gradient of hidden layer
+    dJ_dWt = np.zeros((2, 2))
+    dJ_dbt = np.zeros(2)
+    tmp_t0 = tmp * w[0] * dsig_a_h[:, 0]
+    dJ_dWt[0, 0] = np.mean(tmp_t0 * x[:, 0])
+    dJ_dWt[1, 0] = np.mean(tmp_t0 * x[:, 1])
+    dJ_dbt[0] = np.mean(tmp_t0)
+
+    tmp_t1 = tmp * w[1] * dsig_a_h[:, 1]
+    dJ_dWt[0, 1] = np.mean(tmp_t1 * x[:, 0])
+    dJ_dWt[1, 1] = np.mean(tmp_t1 * x[:, 1])
+    dJ_dbt[1] = np.mean(tmp_t1)
+
+    # Weight update
+    w_new = w - lr * dJ_dw
+    b_new = b - lr * dJ_db
+    Wt_new = Wt - lr * dJ_dWt
+    bt_new = bt - lr * dJ_dbt
 
     return w_new, b_new, Wt_new, bt_new
 
@@ -127,7 +156,9 @@ def evaluate_prediction(x, t, w, b, Wt, bt):
     assert Wt.shape == (2, 2)
     assert bt.shape == (2,)
 
-    # TODO: add your code here
+    y, _, _, _ = evaluate_network(x, w, b, Wt, bt)
+    pred = np.round(y)
+    perf = np.mean(t == pred) * 100.0
 
     return pred, perf
 
